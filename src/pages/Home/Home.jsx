@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react';
 import Banner from './Banner';
 import HotJobs from './HotJobs';
+import ApplicationsCountUp from '../MyApplications/ApplicationsCountUp';
 
 const Home = () => {
     const jobsPromise = fetch('http://localhost:3000/jobs').then(res => res.json())
@@ -11,6 +12,7 @@ const Home = () => {
             <Suspense fallback={'Loading hot jobs'}>
                 <HotJobs jobsPromise = {jobsPromise}></HotJobs>
             </Suspense>
+            <ApplicationsCountUp></ApplicationsCountUp>
         </div>
     );
 };
