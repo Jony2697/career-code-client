@@ -6,15 +6,23 @@ const Navbar = () => {
     const { user, logOutUser } = use(AuthContext);
     const links = <>
         <li><NavLink to={'/'}>Home</NavLink></li>
-        <li><NavLink to={''}>Find job</NavLink></li>
+        
         <li><NavLink to={''}>Recruiters</NavLink></li>
         <li><NavLink to={''}>Candidates</NavLink></li>
+
+        {/* for applicant links.check roles as well.*/}
         {
             user && <>
                 <li><NavLink to={'/myApplications'}>My Applications</NavLink></li>
             </>
         }
 
+        {/* for recruitter.check role as well. */}
+        {
+            user && <>
+            <li><NavLink to={'/addJob'}>Add job</NavLink></li>
+            </>
+        }
     </>
 
     const handleSignOut = () => {
