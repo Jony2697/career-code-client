@@ -1,13 +1,55 @@
-import React from 'react';
+import React, { use } from 'react';
+import { AuthContext } from '../../contexts/AuthContext/AuthContext';
+import axios from 'axios';
+import Swal from 'sweetalert2';
 
 const AddJob = () => {
-    const handleAddJob=(e)=>{
+    const { user } = use(AuthContext);
+    const handleAddJob = (e) => {
         e.preventDefault();
-        const form =e.target;
-        const formData=new FormData(form);
-        const data=Object.fromEntries(formData.entries());
+        const form = e.target;
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
         console.log(data);
+
+        //Process salary range data
+        const { min, max, currency, ...newJob } = data;
+        newJob.salaryRange = { min, max, currency }
+
         
+        //process requirements
+        const requirementsString = newJob.requirements;
+        const requirementsDirty = requirementsString.split(',');
+        const requirementsClean = requirementsDirty.map(req => req.trim());
+        newJob.requirements = requirementsClean;
+
+
+        // Process Responsibilities
+        newJob.responsibilities = newJob.responsibilities.split(',').map(req => req.trim());
+        // Status
+        newJob.status = "active";
+        
+
+        console.log(newJob);
+
+        //save job to the database
+        axios.post('http://localhost:3000/jobs', newJob)
+            .then(res => {
+                if (res.data.insertedId) {
+                    Swal.fire({
+                        position: "top-end",
+                        icon: "success",
+                        title: "Job added successfully",
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            })
+
+
 
     }
 
@@ -45,20 +87,21 @@ const AddJob = () => {
                     <legend className="text-lg font-semibold text-gray-700 border-b pb-2">Job Type</legend>
                     <div className="filter w-full border border-gray-300 p-2 rounded-md">
                         <input className="btn filter-reset" type="radio" name="jobType" aria-label="All" />
-                        <input className="btn" type="radio" name="jobType" aria-label="On-Site" />
-                        <input className="btn" type="radio" name="jobType" aria-label="Remote" />
-                        <input className="btn" type="radio" name="jobType" aria-label="Hybrid" />
+                        <input className="btn" type="radio" value={'On-site'} name="jobType" aria-label="On-Site" />
+                        <input className="btn" type="radio" value={'Remote'} name="jobType" aria-label="Remote" />
+                        <input className="btn" type="radio" value={'Hybrid'} name="jobType" aria-label="Hybrid" />
                     </div>
                 </fieldset>
 
                 {/* Job Category */}
                 <fieldset className="space-y-2">
                     <legend className="text-lg font-semibold text-gray-700 border-b pb-2">Job Category</legend>
-                    <select className="select select-bordered w-full">
-                        <option disabled selected>Choose Category</option>
-                        <option>Engineering</option>
-                        <option>Marketing</option>
-                        <option>Finance</option>
+                    <select name='category' className="select select-bordered w-full" defaultValue="">
+                        <option value="" disabled >Choose Category</option>
+                        <option value="Engineering">Design</option>
+                        <option value="Web developer">Web developer</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="Finance">Finance</option>
                     </select>
                 </fieldset>
 
@@ -72,15 +115,15 @@ const AddJob = () => {
                         </div>
                         <div>
                             <label className="block font-medium">Max Salary</label>
-                            <input type="text" name="max" className="input input-bordered w-full" placeholder="e.g. 120000" />
+                            <input type="text" name="max" className="input input-bordered w-full" placeholder="e.g. 70000" />
                         </div>
                         <div>
                             <label className="block font-medium">Currency</label>
-                            <select name="currency" className="select select-bordered w-full">
-                                <option disabled selected>Select Currency</option>
-                                <option>BDT</option>
-                                <option>USD</option>
-                                <option>EUR</option>
+                            <select name="currency" className="select select-bordered w-full" defaultValue={'BDT'}>
+                                <option disabled>Select Currency</option>
+                                <option value="BDT">BDT</option>
+                                <option value="USD">USD</option>
+                                <option value="EUR">EUR</option>
                             </select>
                         </div>
                     </div>
@@ -101,7 +144,7 @@ const AddJob = () => {
                 {/* Deadline */}
                 <fieldset className="space-y-2">
                     <legend className="text-lg font-semibold text-gray-700 border-b pb-2">Application Deadline</legend>
-                    <input type="date" className="input input-bordered w-full" />
+                    <input name='applicationDeadline' type="date" className="input input-bordered w-full" />
                 </fieldset>
 
                 {/* HR Info */}
@@ -114,7 +157,7 @@ const AddJob = () => {
                         </div>
                         <div>
                             <label className="block font-medium">HR Email</label>
-                            <input type="email" name="hr_email" className="input input-bordered w-full" placeholder="HR Email" />
+                            <input type="email" name="hr_email" defaultValue={user.email} className="input input-bordered w-full" placeholder="HR Email" />
                         </div>
                     </div>
                 </fieldset>
