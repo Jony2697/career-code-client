@@ -5,11 +5,11 @@ const ApplicationsList = ({ myApplicationsPromise }) => {
     const applications = use(myApplicationsPromise);
 
     return (
-        <div className='mt-20 mb-10 p-4'>
-            <h1 className='text-2xl text-center mb-6'>Application list :{applications.length}</h1>
+        <div className='mt-10 mb-10 p-4'>
+            <h1 className='text-2xl text-center mb-6 font-semibold text-amber-900'>Application list :{applications.length}</h1>
 
             <div className="overflow-x-auto">
-                <table className="table">
+                <table className="table bg-gray-100 rounded-xl">
                     {/* head */}
                     <thead>
                         <tr>
